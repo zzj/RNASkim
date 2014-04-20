@@ -28,37 +28,124 @@
         </ul>
       </header>
       <section>
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+        <h1>
+<a name="rnaskim" class="anchor" href="#rnaskim"><span class="octicon octicon-link"></span></a>RNASkim</h1>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>RNA-Skim: a rapid method for RNA-Seq quantification at transcript level</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<h2>
+<a name="clustering-the-transcripts-based-on-their-sequence-similarities" class="anchor" href="#clustering-the-transcripts-based-on-their-sequence-similarities"><span class="octicon octicon-link"></span></a>Clustering the transcripts based on their sequence similarities.</h2>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>TODO(zzj)</p>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<h2>
+<a name="building-the-index-for-a-given-transcript-clustering-result" class="anchor" href="#building-the-index-for-a-given-transcript-clustering-result"><span class="octicon octicon-link"></span></a>Building the index for a given transcript clustering result</h2>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>This command downloads a clustering result of the mouse transcriptome. </p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<pre>
+wget http://www.csbio.unc.edu/rs/clustered_gene.fa
+</pre>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>The clustered_gene.fa file uses fasta format, but it may contain more than one transcript per two lines, for example:</p>
 
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<pre>&gt;gid|tid1|tid2
+ATCTATTA|TACTAATC
+</pre> 
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>This presents a transcript cluster named gid which contains two transcripts tid1 and tid2. And the sequence of tid1 is ATCTATTA and the sequence of tid2 is TACTAATC. "|" is the delimiter for both the sequence ids and the sequences. And the first id of the sequence ids is the gene id.</p>
 
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<p>Now you can run the following command to find all sig-mer regions.</p>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<pre>./rs_index -transcript_fasta=clustered_gene.fa -index_file=clustered_gene.fa.pb -num_threads 4</pre>
+
+<p>A sig-mer region is a sequence that all k-mers from the region are sig-mers of the transcript cluster. (Check out the document for the GeneSignatures class at rnasigs.proto for more details). The clustered_gene.fa.pb contains the corresponding GeneSignatures class for every transcript cluster. The storage format is at <a href="https://github.com/zzj/rnasigs/wiki/Code-Structure#wiki-storage-proto_datah">Storage format for protobuf in RNA-Skim</a>.</p>
+
+<p>The default sig-mer size is 40. </p>
+
+<pre>./rs_index -transcript_fasta=clustered_gene.fa -index_file=clustered_gene.fa.pb -rs_length 50 -num_threads 4</pre>
+
+<p>You can check all arguments information by</p>
+
+<pre>./rs_index --help </pre>
+
+<p><strong>The "--help" parameter also works for other executables.</strong> The output list all parameters into different sections by their source files, and only the parameters defined in the RNA-Skim sources (the file names start with "rs_") are defined by RNA-Skim. Or you can run </p>
+
+<pre>./rs_index --helpshort
+./rs_select --helpshort
+./rs_count --helpshort
+./rs_estimate --helpshort
+</pre>
+
+<p>to filter out all unnecessary parameters.</p>
+
+<h2>
+<a name="selecting-sig-mers-from-the-sig-mer-regions" class="anchor" href="#selecting-sig-mers-from-the-sig-mer-regions"><span class="octicon octicon-link"></span></a>Selecting sig-mers from the sig-mer regions</h2>
+
+<p>OK, now you have the clustered_gene.fa.pb file. Let's select sig-mers from all sig-mer regions:</p>
+
+<pre>./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk</pre>
+
+<p><strong>If you use sig-mer size other than the default value, you should specify the length in the parameter list as well,</strong> for example:</p>
+
+<pre>./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk  -rs_length 50</pre>
+
+<p>Please be careful about this. This is annoying and should be <a href="https://github.com/zzj/rnasigs/issues/14">fixed</a>. </p>
+
+<p>You may see some warnings like this,</p>
+
+<pre>E0309 21:20:25.820291 1990034192 rs_select.cc:130] ENSMUST00000114890 has 1 rna_signatures. Skipped.</pre>
+
+<p>For some transcripts, RNA-Skim cannot get enough number of sig-mers, so it does not quantify such transcripts because the results of those transcripts are not reliable. Most of such transcripts are either too short (less than 150 bps) or categorized as "predicted gene".</p>
+
+<p>The output file (clustered_gene.fa.sk) is a list of SelectedKey objects. For details, please checkout the comments for SelectedKey at rnasigs.proto.</p>
+
+<h2>
+<a name="simulating-the-rna-seq-data" class="anchor" href="#simulating-the-rna-seq-data"><span class="octicon octicon-link"></span></a>Simulating the RNA-Seq data</h2>
+
+<p>Please run the download.py file first (<a href="https://github.com/zzj/rnasigs/wiki/Internal-Development-Guide">Internal Development Guide</a>). Remember to clean up the gtf file (details at the internal develop guide)</p>
+
+<p>We use <a href="http://sammeth.net/confluence/display/SIM/Home">Flux simulator</a> to simulate RNA-Seq data. If you have run bootstrap.sh command, it should be installed at lib/flux-simulator-1.2. If not, please file an issue and fix bootstrap.sh file. </p>
+
+<p>The following command generates a test data of 1million paired reads</p>
+
+<pre>cd ..
+mkdir test
+cp simulation/test.par test
+cd test
+export FLUX_MEM="6G";
+../lib/flux-simulator-1.2/bin/flux-simulator -p test.par
+</pre>
+
+<p>Now, we have four extra files (test.bed, test.fastq, test.lib, test.pro). The two most important files are test.fastq (RNASeq fastq files) and the test.pro (the simulated abundance values. More details at <a href="http://sammeth.net/confluence/display/SIM/.PRO+Transcriptome+Profile">here</a>).</p>
+
+<p>This command split the fastq files into two fasta files (test.fastq_1  and test.fastq_2) and two fastq files (test.fastq_1.fastq and test.fastq_2.fastq).</p>
+
+<pre>
+python ../simulation/split_fasta.py test.fastq
+</pre>
+
+<p>For more details, check out the web site of the flux simulator.</p>
+
+<h2>
+<a name="counting-the-sig-mers-for-a-given-rna-seq-dataset" class="anchor" href="#counting-the-sig-mers-for-a-given-rna-seq-dataset"><span class="octicon octicon-link"></span></a>Counting the sig-mers for a given RNA-Seq dataset</h2>
+
+<p>Now, we run rs_count to count all sig-mers stored in the clustered_gene.fa.sk file.</p>
+
+<pre>GLOG_logtostderr=1  ../src/rs_count  -selected_keys_file=clustered_gene.fa.sk -count_file=clustered_gene.fa.cf -read_files1=../test/test.fastq_1 -read_files2=../test/test.fastq_2 -num_threads=1 -rs_length (INPUT_YOUR_SIG_MER_LENGTH_HERE)</pre>
+
+<p>This generates clustered_gene.fa.cf file, which is almost identical with the clustered_gene.fa.sk file, but the count fields in the SelectedKey object in the clustered_gene.fa.cf file is the real occurrences of their corresponding sig-mers.</p>
+
+<h2>
+<a name="quantifying-the-abundances-of-transcripts" class="anchor" href="#quantifying-the-abundances-of-transcripts"><span class="octicon octicon-link"></span></a>Quantifying the abundances of transcripts</h2>
+
+<p>This command quantifies the transcriptome based on the counts of sig-mers in the clustered_gene.fa.cf file.</p>
+
+<pre>
+../src/rs_estimate -count_file=clustered_gene.fa.cf &gt; estimation
+</pre>
+
+<p>There are four columns in the estimation file: transcript id; the length of the transcript; estimated number of relative reads; RPKM value of the transcript.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/zzj">zzj</a></p>
