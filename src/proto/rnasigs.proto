@@ -1,0 +1,73 @@
+package rs;
+
+message Gene {
+    message Variant {
+        optional int32 abs_pos = 1;
+        optional int32 rel_pos = 2;
+        optional string ref_chr = 3;
+        optional string all_chr = 4;
+    }
+    message Transcript {
+        message Exon {
+            optional int32 start = 1;
+            optional int32 end = 2;
+            optional string seq = 3;
+            repeated Variant variants = 9;
+        }
+        optional string id = 1;
+        optional string seq = 2;
+        repeated Exon exons = 3;
+        optional string name = 4;
+        repeated Variant variants = 5;
+    }
+    optional string id = 1;
+    optional string name = 2;
+    repeated Transcript transcripts = 3;
+    optional string seqname = 4;
+    optional string biotype = 5;
+    optional string strand = 6;
+    optional string source = 7;
+    optional bool has_seq = 8;
+}
+
+message GeneSignatures {
+  message TranscriptSignatures {
+    message SignatureMeta {
+      // the sequence of the signature
+      required string seq = 1;
+      // the position of the signature in the transcript sequence
+      required int32 position = 2;
+    }
+    // transcript id
+    required string id = 1;
+    // the length of the transcript
+    required int32 length = 2;
+    repeated SignatureMeta signatures = 3;
+  }
+  // gene id
+  required string id = 1;
+  repeated TranscriptSignatures transcripts = 2;
+}
+
+message SelectedKey {
+  // the gene id
+  required string gid = 1;
+  // transcript idx in transcript signatures, this may be repeated.
+  message Key {
+    message TranscriptInfo {
+      required int32 tidx = 1;
+      // position in the transcript, this has the same length with tidx
+      repeated int32 positions = 2;
+    }
+    // the substring that only occurs within this gene
+    required string key = 2;
+    repeated TranscriptInfo transcript_infos = 3;
+    optional int32 count = 4;
+  }
+  repeated Key keys = 2;
+  // the id of the transcripts
+  repeated string tids = 3;
+  // the length of the transcript sequence
+  // this has the same length with tids
+  repeated int32 lengths = 4;
+};

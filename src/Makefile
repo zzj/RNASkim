@@ -146,7 +146,6 @@ karp_robin_hash_test: karp_robin_hash_test.cc karp_robin_hash.cc karp_robin_hash
 
 rs/rnasigs_pb2.py: proto/rnasigs.proto
 	../third_party/bin/protoc --python_out=./ proto/rnasigs.proto
-	cp proto/rnasigs_pb2.py rs/
 	cp proto/rnasigs_pb2.py python/
 
 proto/rnasigs.pb.h: proto/rnasigs.proto
