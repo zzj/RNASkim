@@ -32,8 +32,8 @@ LIB =
 # to compile, commet this line when you do not want to release the
 # software
 #STATIC = -static
-LDFLAGS = -O3  ../lib/gflags-2.0/.libs/libgflags.a \
-	../lib/glog-0.3.3/.libs/libglog.a  -lpthread \
+LDFLAGS = -O3  ../lib/glog-0.3.3/.libs/libglog.a \
+	../lib/gflags-2.0/.libs/libgflags.a -lpthread \
 	 ../lib/protobuf-2.5.0/src/.libs/libprotobuf.a
 LDFLAGS_WITH_STATIC = $(LDFLAGS) $(STATIC)
 
