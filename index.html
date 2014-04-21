@@ -59,7 +59,7 @@ ATCTATTA|TACTAATC
 
 <pre>./rs_index -transcript_fasta=clustered_gene.fa -index_file=clustered_gene.fa.pb -num_threads 4</pre>
 
-<p>A sig-mer region is a sequence that all k-mers from the region are sig-mers of the transcript cluster. (Check out the document for the GeneSignatures class at rnasigs.proto for more details). The clustered_gene.fa.pb contains the corresponding GeneSignatures class for every transcript cluster. The storage format is at <a href="https://github.com/zzj/rnasigs/wiki/Code-Structure#wiki-storage-proto_datah">Storage format for protobuf in RNA-Skim</a>.</p>
+<p>A sig-mer region is a sequence that all k-mers from the region are sig-mers of the transcript cluster. (Check out the document for the GeneSignatures class at rnasigs.proto for more details). The clustered_gene.fa.pb contains the corresponding GeneSignatures class for every transcript cluster. </p>
 
 <p>The default sig-mer size is 40. </p>
 
@@ -99,33 +99,6 @@ ATCTATTA|TACTAATC
 <p>For some transcripts, RNA-Skim cannot get enough number of sig-mers, so it does not quantify such transcripts because the results of those transcripts are not reliable. Most of such transcripts are either too short (less than 150 bps) or categorized as "predicted gene".</p>
 
 <p>The output file (clustered_gene.fa.sk) is a list of SelectedKey objects. For details, please checkout the comments for SelectedKey at rnasigs.proto.</p>
-
-<h2>
-<a name="simulating-the-rna-seq-data" class="anchor" href="#simulating-the-rna-seq-data"><span class="octicon octicon-link"></span></a>Simulating the RNA-Seq data</h2>
-
-<p>Please run the download.py file first (<a href="https://github.com/zzj/rnasigs/wiki/Internal-Development-Guide">Internal Development Guide</a>). Remember to clean up the gtf file (details at the internal develop guide)</p>
-
-<p>We use <a href="http://sammeth.net/confluence/display/SIM/Home">Flux simulator</a> to simulate RNA-Seq data. If you have run bootstrap.sh command, it should be installed at lib/flux-simulator-1.2. If not, please file an issue and fix bootstrap.sh file. </p>
-
-<p>The following command generates a test data of 1million paired reads</p>
-
-<pre>cd ..
-mkdir test
-cp simulation/test.par test
-cd test
-export FLUX_MEM="6G";
-../lib/flux-simulator-1.2/bin/flux-simulator -p test.par
-</pre>
-
-<p>Now, we have four extra files (test.bed, test.fastq, test.lib, test.pro). The two most important files are test.fastq (RNASeq fastq files) and the test.pro (the simulated abundance values. More details at <a href="http://sammeth.net/confluence/display/SIM/.PRO+Transcriptome+Profile">here</a>).</p>
-
-<p>This command split the fastq files into two fasta files (test.fastq_1  and test.fastq_2) and two fastq files (test.fastq_1.fastq and test.fastq_2.fastq).</p>
-
-<pre>
-python ../simulation/split_fasta.py test.fastq
-</pre>
-
-<p>For more details, check out the web site of the flux simulator.</p>
 
 <h2>
 <a name="counting-the-sig-mers-for-a-given-rna-seq-dataset" class="anchor" href="#counting-the-sig-mers-for-a-given-rna-seq-dataset"><span class="octicon octicon-link"></span></a>Counting the sig-mers for a given RNA-Seq dataset</h2>
