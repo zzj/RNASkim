@@ -1,7 +1,6 @@
 # TODO: rewite everything in Python
 # It is easier to maintain and incorporate with my other scripts.
 
-export CXX=g++
 export RS_HOME=`pwd`
 export LDFLAGS="-L$RS_HOME/lib/gflags-2.0/.libs/ -L$RS_HOME/lib/glog-0.3.3/.libs/"
 export CPPFLAGS="-I$RS_HOME/lib/gflags-2.0/src/  -I$RS_HOME/lib/glog-0.3.3/src/"
@@ -34,7 +33,7 @@ cd gflags-2.0
 make
 cd ..
 
-wget https://google-glog.googlecode.com/files/glog-0.3.3.tar.gz
+wget  --no-check-certificate https://google-glog.googlecode.com/files/glog-0.3.3.tar.gz
 tar zxf glog-0.3.3.tar.gz
 cd glog-0.3.3
 ./configure

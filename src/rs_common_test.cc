@@ -30,5 +30,9 @@ TEST(EvenlySample, simple_test) {
   }
 }
 
+TEST(GetFileSize, simple_test) {
+  ASSERT_EQ(160173, get_file_size("test_data/fa_reader_test.fasta.1"));
+}
+
 }  // namespace
 }  // namespace rs
