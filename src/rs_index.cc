@@ -35,8 +35,6 @@ DEFINE_int32(num_threads, -1,
 DEFINE_int32(rs_length, 40,
            "The length of the RS signature.");
 
-// we get this from "wc data/transcript.fa"
-const int TOTAL_LENGTH = 114795646;
 
 namespace rs {
 
@@ -201,8 +199,10 @@ public:
             int num_threads)
     : file_(transcript_fasta_filename),
       output_file_(output_file), num_threads_(num_threads) {
-    all_bloom_ = new RSBloom(TOTAL_LENGTH * 10, 0.001);
-    dup_bloom_ = new RSBloom(TOTAL_LENGTH * 10, 0.001);
+    const uint64_t total_length = get_file_size(transcript_fasta_filename);
+    LOG(INFO) << "The estimated total number of k-mers is " << total_length;
+    all_bloom_ = new RSBloom(total_length * 10, 0.001);
+    dup_bloom_ = new RSBloom(total_length * 10, 0.001);
   }
 
   void run() {

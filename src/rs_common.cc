@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include "glog/logging.h"
 
 #include "rs_common.h"
@@ -81,6 +82,13 @@ string first_seq_in_order(string seq) {
 
   sort(seqs.begin(), seqs.end());
   return seqs[0];
+}
+
+uint64_t get_file_size(const string& filename) {
+  std::ifstream in(filename, std::ifstream::in | std::ifstream::binary);
+  LOG_IF(FATAL, !in.is_open()) << "Failed to open " << filename;
+  in.seekg(0, std::ifstream::end);
+  return in.tellg();
 }
 
 }  // namespace rs
