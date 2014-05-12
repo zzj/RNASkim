@@ -50,8 +50,8 @@ RSPairReader::RSPairReader(const std::vector<std::string>& files1,
   : files1_(files1), files2_(files2),
     fd1_(nullptr), fd2_(nullptr), buffer_size_(buffer_size) {
 
-  LOG_IF(FATAL, files1.size() != files2.size())
-    << "Different size of paired files";
+  LOG_IF(INFO, files1.size() != files2.size())
+    << "Different size of paired files. Use single read mode.";
   LOG_IF(FATAL, files1.size() != 1)
     << "Cannot support more than one fasta file yet";
   LOG_IF(FATAL, files1.size() == 0)
@@ -59,12 +59,16 @@ RSPairReader::RSPairReader(const std::vector<std::string>& files1,
   current_file_idx_ = 0;
   fd1_.open(files1_[current_file_idx_].c_str(), ios::in);
   LOG_IF(FATAL, !fd1_.good()) << "Failed to open file "
-                             << files1_[current_file_idx_];
-  fd2_.open(files2_[current_file_idx_].c_str(), ios::in);
-  LOG_IF(FATAL, !fd2_.good()) << "Failed to open file "
-                             << files2_[current_file_idx_];
+                              << files1_[current_file_idx_];
+  if (files2.size() != 0) {
+    fd2_.open(files2_[current_file_idx_].c_str(), ios::in);
+    LOG_IF(FATAL, !fd2_.good()) << "Failed to open file "
+                                << files2_[current_file_idx_];
+  }
+
   fd1_.rdbuf()->pubsetbuf(buffer1, 1024 * 1024 * 20);
   fd2_.rdbuf()->pubsetbuf(buffer2, 1024 * 1024 * 20);
+
   total_time = 0;
 }
 
@@ -72,36 +76,44 @@ RSPairReader::RSPairReader(const std::vector<std::string>& files1,
 int RSPairReader::read(vector<string>* reads1, vector<string>* reads2) {
   struct timeval start_time, end_time;
   gettimeofday(&start_time, NULL);
-  reads1->resize(buffer_size_); reads2->resize(buffer_size_);
-  string id1, id2;
-  string read1, read2;
-  int total_reads = 0;
+
   std::lock_guard<std::mutex> lock(m_);
-  while(!fd1_.eof() && !fd2_.eof()) {
+
+  int total_reads = read_from_fd(fd1_, reads1);
+  if (fd2_.good()) {
+    read_from_fd(fd2_, reads2);
+  }
+  gettimeofday(&end_time, NULL);
+  total_time += end_time.tv_sec - start_time.tv_sec + (end_time.tv_usec - start_time.tv_usec) / 1000000.0;
+  return total_reads;
+}
+
+int RSPairReader::read_from_fd(fstream &fd, vector<string> * reads) {
+  int total_reads = 0;
+  reads->resize(buffer_size_);
+  while(!fd.eof()) {
     // ignore the id line
-    fd1_.ignore(256 * 256,'\n');
-    fd2_.ignore(256 * 256,'\n');
-    fd1_ >> reads1->at(total_reads);
-    fd2_ >> reads2->at(total_reads);
+    fd.ignore(256 * 256,'\n');
+    fd >> reads->at(total_reads);
     // ignore the remaining new line character
-    fd1_.ignore(256 * 256,'\n');
-    fd2_.ignore(256 * 256,'\n');
-    read_quality_score();
+    fd.ignore(256 * 256,'\n');
+
+    read_quality_score(fd);
     // only add if the line is not empty
-    if (reads1->at(total_reads).size() > 2) {
+    if (reads->at(total_reads).size() > 2) {
       total_reads ++;
     } else {
       break;
     }
     if (total_reads >= buffer_size_) break;
   }
-  reads1->resize(total_reads), reads2->resize(total_reads);
-  gettimeofday(&end_time, NULL);
-  total_time += end_time.tv_sec - start_time.tv_sec + (end_time.tv_usec - start_time.tv_usec) / 1000000.0;
+  reads->resize(total_reads);
   return total_reads;
 }
 
-void RSPairReader::read_quality_score() {
+void RSPairReader::read_quality_score(fstream& fd) {
+  // does nothing
+  // no quality score lines in fasta files
 }
 
 RSFastqPairReader::RSFastqPairReader(const std::vector<std::string>& files1,
@@ -109,11 +121,9 @@ RSFastqPairReader::RSFastqPairReader(const std::vector<std::string>& files1,
                                      int buffer_size)
   : RSPairReader(files1, files2, buffer_size) {}
 
-void RSFastqPairReader::read_quality_score() {
-  fd1_.ignore(256 * 256,'\n');
-  fd2_.ignore(256 * 256,'\n');
-  fd1_.ignore(256 * 256,'\n');
-  fd2_.ignore(256 * 256,'\n');
+void RSFastqPairReader::read_quality_score(fstream& fd) {
+  fd.ignore(256 * 256,'\n');
+  fd.ignore(256 * 256,'\n');
 }
 
 }  // namespace rs

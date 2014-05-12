@@ -77,6 +77,11 @@ public:
         // since the counter contains all four different keys,
         // here, we only need to process the sequence once.
         counter_->process(reads1[i]);
+      }
+      LOG(INFO) << "reads2.size() = " << reads2.size();
+      // The only reason that reads1.size() != reads2.size() is that
+      // the program is in the single read mode.
+      for (uint32_t i = 0; i < reads2.size(); i++) {
         counter_->process(reads2[i]);
       }
       total += reads1.size();
@@ -173,6 +178,8 @@ public:
     vector<SelectedKey> selected_keys_for_em;
     vector<string> keys;
     LOG(INFO) << "Loading selected keys .. ";
+    LOG_IF(FATAL, !stream_.good()) << "Failed to open the index file"
+                                   << index_file_;
     while(load_protobuf_data(&stream_, &sk, buffer, buffer_size)) {
       for (int i = 0; i < sk.keys_size(); i++) {
         string key = sk.keys(i).key();
