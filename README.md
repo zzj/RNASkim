@@ -7,8 +7,7 @@ RNA-Skim: a rapid method for RNA-Seq quantification at transcript level
 How to compile RNA-Skim?
 ------------------------
 
-RNA-Skim is implemented in C++ (heavily using C++11 standard). Please make sure that g++ (>= 4.7) is installed. Note: The default compiler of MacOS is clang, and currently RNA-Skim cannot be compiled by clang, so, please make sure that g++ is your default compiler, e.g., "export CXX=/opt/local/bin/g++-mp-4.8". 
-
+RNA-Skim is implemented in C++ (heavily using C++11 standard). Please make sure that g++ (>= 4.7) is installed. Note: The default compiler of MacOS is clang, and currently RNA-Skim cannot be compiled by clang, so, please make sure that g++ is your default compiler, e.g., "export CXX=/opt/local/bin/g++-mp-4.8". If you set the default compiler to g++, please run the following commands to compile the executables:
 
 
 ```bash
@@ -69,4 +68,57 @@ GLOG_logtostderr=1 ./rs_cluster  -gene_fasta=gene.fa -num_threads=4 -output=clus
 
 The rs_length parameter is the length of k-mer used for calculating the similarity. 
 And the clustered.fa is also in the same specialized FASTA format. In this case, each item represents a cluster, and the first field is randomly selected from the genes in the cluster (we do not track the gene id in the future analysis). 
+
+rs_index
+--------
+
+Now you can run the following command to find all sig-mer regions.
+
+```
+GLOG_logtostderr=1  ./rs_index -transcript_fasta=clustered.fa -index_file=clustered_gene.fa.pb -num_threads 4
+```
+A sig-mer region is a sequence that all k-mers from the region are sig-mers of the transcript cluster. (Check out the document for the GeneSignatures class at rnasigs.proto for more details). The clustered_gene.fa.pb contains the corresponding GeneSignatures class for every transcript cluster.
+
+rs_select
+---------
+
+OK, now you have the clustered_gene.fa.pb file. Let's select sig-mers from all sig-mer regions:
+
+```GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk```
+
+**If you use sig-mer size other than the default value, you should specify the length in the parameter list as well,** for example:
+
+```GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk  -rs_length 50```
+
+
+You may see some warnings like this,
+
+```E0309 21:20:25.820291 1990034192 rs_select.cc:130] ENSMUST00000114890 has 1 rna_signatures. Skipped.```
+
+For some transcripts, RNA-Skim cannot get enough number of sig-mers, so it does not quantify such transcripts because the results of those transcripts are not reliable. Most of such transcripts are either too short (less than 150 bps) or categorized as "predicted gene".
+
+The output file (clustered_gene.fa.sk) is a list of SelectedKey objects. For details, please checkout the comments for SelectedKey at rnasigs.proto.
+
+rs_count
+--------
+
+rs_count counts the occurrences of the sig-mers for a given RNA-Seq dataset
+
+Now, we run rs\_count to count all sig-mers stored in the clustered_gene.fa.sk file.
+
+```GLOG_logtostderr=1  ../src/rs_count  -selected_keys_file=clustered_gene.fa.sk -count_file=clustered_gene.fa.cf -read_files1=../test/test.fastq_1 -read_files2=../test/test.fastq_2 -num_threads=1```
+
+This generates clustered\_gene.fa.cf file, which is almost identical with the clustered\_gene.fa.sk file, but the count fields in the SelectedKey object in the clustered_gene.fa.cf file is the real occurrences of their corresponding sig-mers.
+
+rs_estimate
+-----------
+
+rs_estimate quantifies the abundances of transcripts based on the occurrences of sig-mers.
+
+This command quantifies the transcriptome based on the counts of sig-mers in the clustered_gene.fa.cf file.
+<pre>
+../src/rs_estimate -count_file=clustered_gene.fa.cf > estimation
+</pre>
+
+There are four columns in the estimation file: transcript id; the length of the transcript; estimated number of relative reads; RPKM value of the transcript.
 
