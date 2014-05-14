@@ -106,7 +106,9 @@ rs_count counts the occurrences of the sig-mers for a given RNA-Seq dataset
 
 Now, we run rs\_count to count all sig-mers stored in the clustered_gene.fa.sk file.
 
-```GLOG_logtostderr=1  ../src/rs_count  -selected_keys_file=clustered_gene.fa.sk -count_file=clustered_gene.fa.cf -read_files1=../test/test.fastq_1 -read_files2=../test/test.fastq_2 -num_threads=1```
+```
+GLOG_logtostderr=1  ../src/rs_count  -selected_keys_file=clustered_gene.fa.sk -count_file=clustered_gene.fa.cf -read_files1=../test/test.fastq_1 -read_files2=../test/test.fastq_2 -num_threads=1
+```
 
 This generates clustered\_gene.fa.cf file, which is almost identical with the clustered\_gene.fa.sk file, but the count fields in the SelectedKey object in the clustered_gene.fa.cf file is the real occurrences of their corresponding sig-mers.
 
@@ -116,9 +118,9 @@ rs_estimate
 rs_estimate quantifies the abundances of transcripts based on the occurrences of sig-mers.
 
 This command quantifies the transcriptome based on the counts of sig-mers in the clustered_gene.fa.cf file.
-<pre>
+```
 ../src/rs_estimate -count_file=clustered_gene.fa.cf > estimation
-</pre>
+```
 
 There are four columns in the estimation file: transcript id; the length of the transcript; estimated number of relative reads; RPKM value of the transcript.
 
