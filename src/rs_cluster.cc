@@ -17,8 +17,8 @@
 
 using namespace std;
 
-DEFINE_string(transcript_fasta, "",
-              "The fasta file for every transcript sequences.");
+DEFINE_string(gene_fasta, "",
+              "The fasta file for transcript sequences of every gene. We use a specialized FASTA format, in which each line represents a gene and its transcripts.  A transcript sequence per line is not recommended. ");
 DEFINE_string(output, "clustered_gene.fa",
               "The output of the result");
 DEFINE_int32(num_threads, -1,
@@ -231,7 +231,7 @@ int main(int argc, char *argv[]) {
   omp_set_num_threads(FLAGS_num_threads);
 
   vector<rs::FastaRecord> records;
-  rs::load_records(FLAGS_transcript_fasta, &records);
+  rs::load_records(FLAGS_gene_fasta, &records);
 
   rs::calculate_similarity(&records);
 
