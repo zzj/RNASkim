@@ -34,7 +34,7 @@ LIB =
 #STATIC = -static
 LDFLAGS = -O3  ../lib/glog-0.3.3/.libs/libglog.a \
 	../lib/gflags-2.0/.libs/libgflags.a -lpthread \
-	 ../lib/protobuf-2.5.0/src/.libs/libprotobuf.a
+	 ../lib/protobuf-2.5.0/src/.libs/libprotobuf.a -fopenmp
 LDFLAGS_WITH_STATIC = $(LDFLAGS) $(STATIC)
 
 INC = -I. -I../lib/gflags-2.0/src/ \
@@ -103,7 +103,7 @@ all: proto/rnasigs.pb.h rs/rnasigs_pb2.py gtest_main.a $(SOURCES) \
 
 # Flags passed to the preprocessor.
 CPPFLAGS = $(INC) -I$(GTEST_DIR)/include -O3 -Wall -Wextra  -std=c++0x \
-	-fpermissive $(STATIC) -D_GLIBCXX_USE_NANOSLEEP
+	-fpermissive $(STATIC) -D_GLIBCXX_USE_NANOSLEEP -fopenmp
 
 $(RS_CLUSTER_EXECUTABLE): $(RS_CLUSTER_OBJECTS) $(RS_BLOOM_OBJECTS) $(FA_READER_OBJECTS)
 	$(CXX) $(LIB) $^ $(LDFLAGS_WITH_STATIC) -o $@
