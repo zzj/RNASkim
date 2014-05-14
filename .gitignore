@@ -22,3 +22,29 @@
 
 # dependency
 *.P
+
+# temporary files
+*~
+
+# machine generated files
+data
+lib/
+src/clustered_gene.fa
+src/clustered_gene.fa.cf
+src/clustered_gene.fa.pb
+src/fa_reader_test
+src/karp_robin_hash_test
+src/overlap_map
+src/proto/rnasigs.pb.cc
+src/proto/rnasigs.pb.h
+src/proto/rnasigs_pb2.py
+src/python/
+src/rolling_hash_counter_test
+src/rs_bloom_test
+src/rs_cluster
+src/rs_common_test
+src/rs_count
+src/rs_estimate
+src/rs_index
+src/rs_select
+third_party/
