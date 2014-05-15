@@ -75,9 +75,9 @@ rs_index
 Now you can run the following command to find all sig-mer regions.
 
 ```
-GLOG_logtostderr=1  ./rs_index -transcript_fasta=clustered.fa -index_file=clustered_gene.fa.pb -num_threads 4
+GLOG_logtostderr=1  ./rs_index -transcript_fasta=clustered.fa -index_file=clustered_gene.fa.pb -rs_length=60 -num_threads 4
 ```
-A sig-mer region is a sequence that all k-mers from the region are sig-mers of the transcript cluster. (Check out the document for the GeneSignatures class at rnasigs.proto for more details). The clustered_gene.fa.pb contains the corresponding GeneSignatures class for every transcript cluster.
+A sig-mer region is a sequence that all k-mers from the region are sig-mers of the transcript cluster. (Check out the document for the GeneSignatures class at rnasigs.proto for more details). The clustered\_gene.fa.pb contains the corresponding GeneSignatures class for every transcript cluster. Please make sure to use the same value for rs\_length for all executables. 
 
 rs_select
 ---------
@@ -88,7 +88,7 @@ OK, now you have the clustered_gene.fa.pb file. Let's select sig-mers from all s
 
 **If you use sig-mer size other than the default value, you should specify the length in the parameter list as well,** for example:
 
-```GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk  -rs_length 50```
+```GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk  -rs_length=60```
 
 
 You may see some warnings like this,
