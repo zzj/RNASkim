@@ -134,5 +134,5 @@ This command quantifies the transcriptome based on the counts of sig-mers in the
 ../src/rs_estimate -count_file=clustered_gene.fa.cf > estimation
 ```
 
-There are four columns in the estimation file: transcript id; the length of the transcript; estimated number of relative reads; RPKM value of the transcript.
+There are five columns in the estimation file: transcript id, the length of the transcript, the estimated number of reads reads (scaled), RPKM value of the transcript, TPM value of the transcript.
 
