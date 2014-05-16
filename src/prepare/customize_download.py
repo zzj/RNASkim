@@ -98,7 +98,21 @@ def main(parser):
     echo("Donwload Completed")
     transcript_fasta, gene_fasta, transcript_fasta_pc, gene_fasta_pc = generate_fasta.generate(
         root, gtf_file, gtf_protein_coding_file, fa_file)
-    print transcript_fasta, gene_fasta, transcript_fasta_pc, gene_fasta_pc
+    # remove "../"
+    gene_fasta = gene_fasta[3:]
+    gene_fasta_pc = gene_fasta_pc[3:]
+    print "We've successfully generated 2 specialized FASTA format files: " + gene_fasta + " " + gene_fasta_pc
+    print "Now you can use the following commands to build the index file (using the protein coding file as an example):"
+    print "These commands only work under the src folder (remember to \"cd ..\" first)"
+    print "  GLOG_logtostderr=1 ./rs_cluster -gene_fasta=" + gene_fasta_pc +  " -rs_length=60 -output=clustered_gene.fa"
+    print "  GLOG_logtostderr=1 ./rs_index -gene_fasta=clustered_gene.fa -index_file=clustered_gene.fa.pb -rs_length=60"
+    print "  GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk -rs_length=60"
+    print ""
+    print "Now you should have a file named clustered_gene.fa.sk under the src folder"
+    print "You can run the following commands to quantify an RNA-Seq dataset:"
+    print "  GLOG_logtostderr=1 ./rs_count  -selected_keys_file=clustered_gene.fa.sk -count_file=clustered_gene.fa.cf -read_files1=../test/test.fastq_1 -read_files2=../test/test.fastq_2 -rs_length=60"
+    print "  GLOG_logtostderr=1 ./rs_estimate -count_file=clustered_gene.fa.cf > estimation"
+    print "There are four columns in the estimation file: transcript id; the length of the transcript; estimated number of relative reads; RPKM value of the transcript."
 
 if __name__ == "__main__":
 
