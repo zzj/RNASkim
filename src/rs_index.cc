@@ -25,8 +25,8 @@ using std::vector;
 using std::fstream;
 using std::ios;
 
-DEFINE_string(transcript_fasta, "",
-              "The fasta file for every transcript sequences.");
+DEFINE_string(gene_fasta, "",
+              "The fasta file for transcript sequences of every gene. This is suggested to use the output of rs_cluster. We use a specialized FASTA format, in which each line represents a gene and its transcripts.  A transcript sequence per line is not recommended. ");
 DEFINE_string(index_file, "",
               "The path to the index file (output).");
 DEFINE_int32(num_threads, -1,
@@ -249,7 +249,7 @@ int main(int argc, char *argv[]) {
   if (FLAGS_num_threads == -1) {
     FLAGS_num_threads = std::thread::hardware_concurrency();
   }
-  rs::IndexMain rsim(FLAGS_transcript_fasta, FLAGS_index_file,
+  rs::IndexMain rsim(FLAGS_gene_fasta, FLAGS_index_file,
                      FLAGS_num_threads);
   rsim.run();
 }

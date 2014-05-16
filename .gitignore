@@ -48,3 +48,6 @@ src/rs_estimate
 src/rs_index
 src/rs_select
 third_party/
+
+# python
+*.pyc

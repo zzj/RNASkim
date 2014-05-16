@@ -27,7 +27,7 @@ using std::vector;
 DEFINE_string(count_file, "",
               "The path to the file that contains all selected keys with their counts (output).");
 DEFINE_int32(rs_length, 40,
-           "The length of the RS signature.");
+           "The length of the sig-mer.");
 DEFINE_int32(read_length, 100,
            "The length of the RNA-seq reads.");
 

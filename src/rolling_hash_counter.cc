@@ -39,18 +39,18 @@ bool RollingHashArray::find_next(uint32_t start, const StringPiece& key,
   uint32_t last = start;
   while (true) {
     if (LIKELY(arena_[start].key.size() == 0)) {
-      empty_hits ++;
+      empty_hits.fetch_add(1, std::memory_order_relaxed);
       *next = start;
       return true;
     }
     // The running time does not improve when we only compare the prefix
     //if (compare_prefix(arena_[start].key, key, 10)) {
     if (UNLIKELY(arena_[start].key == key)) {
-      hits ++;
+      hits.fetch_add(1, std::memory_order_relaxed);
       *next = start;
       return false;
     }
-    misses ++;
+    misses.fetch_add(1, std::memory_order_relaxed);
     start = (start + 1) % capacity_;
     if (UNLIKELY(last == start)) {
       LOG(FATAL) << "The RollingHashArray is full" ;
