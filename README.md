@@ -47,9 +47,9 @@ rs_cluster
 
 rs_cluster clusters the similar genes based on their sequence similarity. 
 
-Before this workflow, you need to prepare a modified FASTA format file, which contains the transcriptome of the subject of interest. 
+Before this workflow, you need to prepare a specialized FASTA format file, which contains the transcriptome of the subject of interest. If you use customize\_download.py, at the end, it outputs two specialized FASTA format files: one contains all transcripts, and the other only contains the protein coding transcripts (the latter is recommended). 
 
-Assuming we have two genes G1 and G2, and G1 has two transcripts T1 and T2, and G2 has one transcript T3. And the sequences of these transcripts are: T1: ATTA, T2: GAGA, T3: TTAA.
+This part explains what is the difference between the regular FASTA format and the specialized FASTA format. Assuming we have two genes G1 and G2, and G1 has two transcripts T1 and T2, and G2 has one transcript T3. And the sequences of these transcripts are: T1: ATTA, T2: GAGA, T3: TTAA.
 
 You need to prepare a fasta file looks like this:
 ```
