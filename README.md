@@ -29,6 +29,18 @@ You can also use "--helpsort" parameter to check all parameters supported by the
 ./rs_cluster --helpsort
 ```
 
+Download data from Ensembl
+--------------------------
+
+We have a python script to help users to download data from Ensembl. Please go to the src/prepare folder, and run the following commands:
+
+```
+cd src/prepare
+python customize_download.py -o homo_sapiens -r current
+python customize_download.py -o mus_musculus -r current
+```
+
+And the "-o" parameter means the population type, and the "-r" means the release number. The data will be downloaded at "data/homo\_sapiens/current" and "data/mus\_musculus/current". At the end, there is a simple description of how to prepare the "clustered\_gene.fa.sk" for quantification, and how to analyze a given set of fasta files. You can also take a look at the following document to check the usage of each command.
 
 rs_cluster
 ----------
