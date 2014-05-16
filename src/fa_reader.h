@@ -47,7 +47,8 @@ namespace rs {
     std::vector<std::string> files1_;
     std::vector<std::string> files2_;
   protected:
-    virtual void read_quality_score();
+    virtual void read_quality_score(fstream& fd);
+    int read_from_fd(fstream& fd, vector<string>* reads);
     fstream fd1_;
     fstream fd2_;
   private:
@@ -62,10 +63,10 @@ namespace rs {
   class RSFastqPairReader : public RSPairReader {
   public:
     RSFastqPairReader(const std::vector<std::string>& files1,
-                 const std::vector<std::string>& files2,
-                 int buffer_size = 50000);
+                      const std::vector<std::string>& files2,
+                      int buffer_size = 50000);
   protected:
-    virtual void read_quality_score();
+    virtual void read_quality_score(fstream& fd);
   };
 }  // namespace rs
 

@@ -6,6 +6,7 @@
 #include <set>
 #include <map>
 #include <cstdio>
+#include <omp.h>
 
 #include "gflags/gflags.h"
 #include "glog/logging.h"
@@ -16,8 +17,8 @@
 
 using namespace std;
 
-DEFINE_string(transcript_fasta, "",
-              "The fasta file for every transcript sequences.");
+DEFINE_string(gene_fasta, "",
+              "The fasta file for transcript sequences of every gene. We use a specialized FASTA format, in which each line represents a gene and its transcripts.  A transcript sequence per line is not recommended. ");
 DEFINE_string(output, "clustered_gene.fa",
               "The output of the result");
 DEFINE_int32(num_threads, -1,
@@ -58,6 +59,7 @@ void load_records(const string& filename, vector<FastaRecord> *records) {
   vector<string> ids, seqs;
   SingleFastaReader* reader = new SingleFastaReader(filename);
 
+  int total = 0;
   while (reader->read(&ids, &seqs) != 0) {
     for (size_t i = 0; i < ids.size(); i++) {
       string whole_seq = seqs[i];
@@ -73,34 +75,35 @@ void load_records(const string& filename, vector<FastaRecord> *records) {
       fr.seqs = seqs;
       fr.tids = ids;
       fr.bloom_filter = new RSBloom(whole_seq.size() * 4, 0.001);
-      if (false) {
-        for (const string& seq : fr.seqs) {
-          // add four different possible sequences into bloom
-          // normal
-          string temp = seq;
-          add_into_bloom_filter(temp, fr.bloom_filter);
+      for (const string& seq : fr.seqs) {
+        // add four different possible sequences into bloom
+        // normal
+        string temp = seq;
+        add_into_bloom_filter(temp, fr.bloom_filter);
 
-          // complimentary
-          compliment(&temp);
-          add_into_bloom_filter(temp, fr.bloom_filter);
+        // complimentary
+        compliment(&temp);
+        add_into_bloom_filter(temp, fr.bloom_filter);
 
-          // complimentary and reversed
-          reverse(temp.begin(), temp.end());
-          add_into_bloom_filter(temp, fr.bloom_filter);
+        // complimentary and reversed
+        reverse(temp.begin(), temp.end());
+        add_into_bloom_filter(temp, fr.bloom_filter);
 
-          // reversed and normal
-          compliment(&temp);
-          add_into_bloom_filter(temp, fr.bloom_filter);
-        }
+        // reversed and normal
+        compliment(&temp);
+        add_into_bloom_filter(temp, fr.bloom_filter);
       }
       records->push_back(fr);
     }
-    LOG(ERROR) << "Data is loaded";
+    total += ids.size();
+    LOG(INFO) << "Loaded " << total << " genes/transcripts into the memory";
   }
+  LOG(INFO) << "Data is loaded";
 }
 
 void calculate_similarity(vector<FastaRecord> *records) {
   FILE* fd = fopen(FLAGS_map_file.c_str(), "w+");
+  #pragma omp parallel for
   for (size_t i = 0; i < records->size(); i++) {
     const FastaRecord& ri = records->at(i);
     vector<string> samples;
@@ -120,8 +123,12 @@ void calculate_similarity(vector<FastaRecord> *records) {
         total ++;
       }
       if (dup >= 1) {
-        LOG(ERROR) << "Found One " << i << ' ' << j;
-        LOG(ERROR) << "Ratio: " << dup << '/' << total;
+        // http://www.gnu.org/software/libc/manual/html_node/Streams-and-Threads.html#Streams-and-Threads
+        // The POSIX standard requires that by default the stream
+        // operations are atomic. I.e., issuing two stream operations
+        // for the same stream in two threads at the same time will
+        // cause the operations to be executed as if they were issued
+        // sequentially.
         fprintf(fd, "%s\t%s\t%d\t%d\n", ri.gid.c_str(), rj.gid.c_str(), dup, total);
       }
     }
@@ -146,7 +153,7 @@ void calculate_similarity(vector<FastaRecord> *records) {
     }
     num_loaded_edges ++;
   }
-  LOG(ERROR) << "Map is loaded. "
+  LOG(INFO) << "Map is loaded. "
              << num_loaded_edges << " loaded into the memory."
              << num_edges << " added to the map.";
   fclose(fd);
@@ -220,13 +227,16 @@ int main(int argc, char *argv[]) {
   if (FLAGS_num_threads == -1) {
     FLAGS_num_threads = std::thread::hardware_concurrency();
   }
+  omp_set_dynamic(0);     // Explicitly disable dynamic teams
+  omp_set_num_threads(FLAGS_num_threads);
+
   vector<rs::FastaRecord> records;
-  rs::load_records(FLAGS_transcript_fasta, &records);
+  rs::load_records(FLAGS_gene_fasta, &records);
 
   rs::calculate_similarity(&records);
 
   vector<vector<int> > cluster_results;
   rs::cluster(records, &cluster_results);
-  LOG(ERROR) << cluster_results.size();
+  LOG(INFO) << "There are " << cluster_results.size() << " clusters.";
   rs::dump_result(records, cluster_results);
 }
