@@ -39,6 +39,8 @@ DEFINE_string(read_files1, "",
               "The fasta read files, splitted by ','");
 DEFINE_string(read_files2, "",
               "The fasta read files, splitted by ','");
+DEFINE_int32(rs_length, 40,
+           "The length of the sig-mer.");
 DEFINE_bool(run_em, false,
            "Whether to run EM when counting.");
 DEFINE_bool(fastq, false,
