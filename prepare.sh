@@ -19,7 +19,7 @@ python setup.py install
 cd ..
 cd ..
 
-pip install leveldb mock protobuf
+pip install leveldb protobuf pyfasta
 
 # install gtest
 
