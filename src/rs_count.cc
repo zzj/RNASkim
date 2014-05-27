@@ -254,7 +254,7 @@ int main(int argc, char *argv[]) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   if (FLAGS_num_threads == -1) {
-    FLAGS_num_threads = std::thread::hardware_concurrency();
+    FLAGS_num_threads = 1;
   }
   LOG(INFO) << "Using " << FLAGS_num_threads << " threads...";
   if (FLAGS_run_em) {
