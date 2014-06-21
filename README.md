@@ -3,6 +3,14 @@ RNA-Skim
 
 RNA-Skim: a rapid method for RNA-Seq quantification at transcript level
 
+Download
+--------
+
+```bash
+git clone git@github.com:zzj/RNASkim.git
+```
+will help you download the lastest source code. You need to compile the executables by yourself by using the following three commands in either a Linux or a Mac environment.
+
 
 How to compile RNA-Skim?
 ------------------------
