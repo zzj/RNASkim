@@ -106,11 +106,15 @@ rs_select
 
 OK, now you have the clustered_gene.fa.pb file. Let's select sig-mers from all sig-mer regions:
 
-```GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk```
+```
+GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk
+```
 
 **If you use sig-mer size other than the default value, you should specify the length in the parameter list as well,** for example:
 
-```GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk  -rs_length=60```
+```
+GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk  -rs_length=60
+```
 
 
 You may see some warnings like this,
@@ -120,6 +124,14 @@ You may see some warnings like this,
 For some transcripts, RNA-Skim cannot get enough number of sig-mers, so it does not quantify such transcripts because the results of those transcripts are not reliable. Most of such transcripts are either too short (less than 150 bps) or categorized as "predicted gene".
 
 The output file (clustered_gene.fa.sk) is a list of SelectedKey objects. For details, please checkout the comments for SelectedKey at rnasigs.proto.
+
+Another parameter that may also help improve the result is `num_kmer_per_region` in rs_selection. This parameter was not documented before. The parameter controls the number of sig-mers we select for quantification. The higher the number is, the more sig-mers will be selected. Unfortunately, the current implementation is not ideal: the number of this parameter is not linearly correlated with the number of sig-mers selected. 
+
+
+```
+GLOG_logtostderr=1 ./rs_select -index_file=clustered_gene.fa.pb -selected_keys_file=clustered_gene.fa.sk  -rs_length=60 -num_kmer_per_region=20
+```
+
 
 rs_count
 --------
