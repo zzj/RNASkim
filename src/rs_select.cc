@@ -27,9 +27,9 @@ DEFINE_string(index_file, "",
 DEFINE_string(selected_keys_file, "",
               "The path to the selected keys file (output).");
 DEFINE_int32(rs_length, 40,
-             "The length of the RS signature.");
-DEFINE_int32(num_kmer_per_transcript, 10,
-             "The length of the RS signature.");
+             "The length of sig-mer.");
+DEFINE_int32(num_kmer_per_region, 10,
+             "The number of sig-mers selected from each sig-mer region.");
 using namespace rs;
 
 void find_all_positions(const string& seq, const string& key,
