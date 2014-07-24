@@ -63,8 +63,8 @@ int main(int argc, char *argv[]) {
     // select keys from every transcripts
     for (int i = 0; i < gene.transcripts_size(); i ++) {
       const auto& transcript = gene.transcripts(i);
-      int step = std::min(50 + (10 - FLAGS_num_kmer_per_transcript) * 10,
-                          (transcript.length() - 20) / FLAGS_num_kmer_per_transcript);
+      int step = std::min(50 + (10 - FLAGS_num_kmer_per_region) * 10,
+                          (transcript.length() - 20) / FLAGS_num_kmer_per_region);
       if (step < 10) {
         step = 10;
       }
