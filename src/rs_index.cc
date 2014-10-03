@@ -249,7 +249,7 @@ int main(int argc, char *argv[]) {
   if (FLAGS_num_threads == -1) {
     FLAGS_num_threads = std::thread::hardware_concurrency();
   }
-  rs::IndexMain rsim(FLAGS_gene_fasta, FLAGS_index_file,
+  rs::IndexMain rsim(FLAGS_transcript_fasta, FLAGS_index_file,
                      FLAGS_num_threads);
   rsim.run();
 }
