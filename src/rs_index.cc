@@ -25,7 +25,7 @@ using std::vector;
 using std::fstream;
 using std::ios;
 
-DEFINE_string(gene_fasta, "",
+DEFINE_string(transcript_fasta, "",
               "The fasta file for transcript sequences of every gene. This is suggested to use the output of rs_cluster. We use a specialized FASTA format, in which each line represents a gene and its transcripts.  A transcript sequence per line is not recommended. ");
 DEFINE_string(index_file, "",
               "The path to the index file (output).");
