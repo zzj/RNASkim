@@ -51,6 +51,13 @@ def parse_extra(extra):
     if(biotype_match.search(extra)):
         biotype = biotype_match.search(extra).group(1)
 
+    # fix the bug in release 77: some genes / transcrips do not have a name
+    if(gid != None and gname == None):
+        gname = gid
+
+    if(tid != None and tname == None):
+        tname = tid
+
     return gid, gname, tid, tname, biotype
 
 def identity(exons):

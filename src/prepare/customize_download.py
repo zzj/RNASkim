@@ -63,7 +63,7 @@ def download(release, organism):
 	os.system("grep -E '^MT|^[XY]|^[0-9]*\t' %s > %s" %
 				(gtf_protein_only_origin + ".backup", gtf_protein_only_origin))
 	os.system("mv %s %s" % (gtf_origin, gtf_origin + ".backup"))
-	os.system("grep -E '^MT|^[XY]|^[0-9]*\t' %s > %s" %(gtf_origin + ".backup", gtf_origin))
+	os.system("grep -E '^MT|^[XY]|^[0-9]*\t' %s > %s" % (gtf_origin + ".backup", gtf_origin))
 
 	## GVF
 	gvf_file = organism.capitalize() + ".gvf.gz"
@@ -72,22 +72,11 @@ def download(release, organism):
 
 	## DNA sequence
 	target = prefix + ".dna.fa"
-	os.system("wget %s/%s" %(fasta_dir, "*.dna.chromosome.[0-9]*.fa.gz"))
-	os.system("wget %s/%s" %(fasta_dir, "*.dna.chromosome.[XYWZ].fa.gz"))
-	os.system("wget %s/%s" %(fasta_dir, "*.dna.chromosome.MT.fa.gz"))
-	os.system("gunzip %s" %("*.dna.chromosome.*.fa.gz"))
-	os.system("cat %s >> %s" %("*.dna.chromosome.*.fa", target))
-	# os.system("mkdir -p fa")
-	# os.system("mv %s fa/" %(prefix + ".dna.chromosome.*.fa"))
-	# os.chdir("fa")
-	# # change filenames
-	# fa_file = [f for f in os.listdir('.') if f.lower().endswith('.fa')]
-	# for f in fa_file:
-	# 	fa_prefix = re.search('.*.chromosome.(.*).fa', f)
-	# 	if(fa_prefix):
-	# 		print("mv %s %s" %(f, fa_prefix.group(1)+".fa"))
-	# 		os.system("mv %s %s" %(f, fa_prefix.group(1)+".fa"))
-	# os.chdir("..")
+	os.system("wget %s/*.dna.chromosome.[0-9]*.fa.gz" % (fasta_dir))
+	os.system("wget %s/*.dna.chromosome.[XYWZ].fa.gz" % (fasta_dir))
+	os.system("wget %s/*.dna.chromosome.MT.fa.gz" % (fasta_dir))
+	os.system("gunzip *.dna.chromosome.*.fa.gz")
+	os.system("cat *.dna.chromosome.*.fa >> %s" % (target))
 	return root, gtf_origin, gtf_protein_only_origin, gvf_file,  target
 
 
