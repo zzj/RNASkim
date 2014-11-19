@@ -74,7 +74,7 @@ void load_records(const string& filename, vector<FastaRecord> *records) {
       ids.erase(ids.begin());
       fr.seqs = seqs;
       fr.tids = ids;
-      fr.bloom_filter = new RSBloom(whole_seq.size() * 4, 0.001);
+      fr.bloom_filter = new RSBloom(whole_seq.size() * 2, 0.001);
       for (const string& seq : fr.seqs) {
         // add four different possible sequences into bloom
         // normal
@@ -83,15 +83,15 @@ void load_records(const string& filename, vector<FastaRecord> *records) {
 
         // complimentary
         compliment(&temp);
-        add_into_bloom_filter(temp, fr.bloom_filter);
+//        add_into_bloom_filter(temp, fr.bloom_filter);
 
         // complimentary and reversed
         reverse(temp.begin(), temp.end());
         add_into_bloom_filter(temp, fr.bloom_filter);
 
         // reversed and normal
-        compliment(&temp);
-        add_into_bloom_filter(temp, fr.bloom_filter);
+//        compliment(&temp);
+//        add_into_bloom_filter(temp, fr.bloom_filter);
       }
       records->push_back(fr);
     }

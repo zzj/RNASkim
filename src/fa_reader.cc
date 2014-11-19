@@ -24,11 +24,18 @@ int SingleFastaReader::read(vector<string>* ids, vector<string>* seqs) {
   std::lock_guard<std::mutex> lock(m_);
   while(!fd_.eof()) {
     fd_ >> id >> read;
+    LOG(INFO) << "Loaded: " << id;
     // only add if the line is not empty
     if (read.size() > 2) {
       // remove the first letter in fasta file. (should be either '>'
       // or '@'.
       ids->push_back(id.substr(1));
+
+      // convert reads to uppercase
+      for (int i = 0; i < read.size(); i++){
+        read[i] = toupper(read[i]);
+      }
+
       seqs->push_back(read);
       total_reads ++;
     } else {

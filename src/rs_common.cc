@@ -17,6 +17,33 @@ void compliment(string* seq) {
       seq->at(i) = 'C'; break;
     case 'C':
       seq->at(i) = 'G'; break;
+
+    case 'M':
+      seq->at(i) = 'K'; break; // amino
+    case 'K':
+      seq->at(i) = 'M'; break;  //keto
+    case 'R':
+      seq->at(i) = 'Y'; break;  // purine
+    case 'Y':
+      seq->at(i) = 'R'; break;  // pyrimidine
+    case 'S':
+      seq->at(i) = 'S'; break;  // strong bonds
+    case 'W':
+      seq->at(i) = 'W'; break;  // weak bonds
+
+    case 'B':
+      seq->at(i) = 'V'; break;  // all but A
+    case 'V':
+      seq->at(i) = 'B'; break;  // all but T
+
+    case 'D':
+      seq->at(i) = 'H'; break;  // all but C
+    case 'H':
+      seq->at(i) = 'D'; break;  // all but G
+
+    case 'N':
+      seq->at(i) = 'N'; break; //anything
+
     default:
       LOG(ERROR) << "Unexpected character: " << seq->at(i) << std::endl
                  << "seq: " << *seq;
