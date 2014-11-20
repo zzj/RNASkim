@@ -24,7 +24,7 @@ int SingleFastaReader::read(vector<string>* ids, vector<string>* seqs) {
   std::lock_guard<std::mutex> lock(m_);
   while(!fd_.eof()) {
     fd_ >> id >> read;
-    LOG(INFO) << "Loaded: " << id;
+
     // only add if the line is not empty
     if (read.size() > 2) {
       // remove the first letter in fasta file. (should be either '>'
